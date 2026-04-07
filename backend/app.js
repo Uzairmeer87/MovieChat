@@ -8,8 +8,9 @@ const app = express();
 // ── Middleware ──────────────────────────────────────────
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
-    methods: ["GET", "POST"],
+    // Allow all origins so your Vercel frontend can connect to your Render backend
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
   })
 );
 app.use(express.json({ limit: "1mb" }));
