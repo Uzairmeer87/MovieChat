@@ -160,6 +160,71 @@ async function getTopRated(genreId = null) {
   return (data.results || []).slice(0, 6).map(normaliseMovie);
 }
 
+/**
+ * Get hidden gems — high-rated but lesser-known films.
+ * Filters by rating >= 7.5 but vote_count between 200 and 3000.
+ */
+async function getHiddenGems() {
+  const data = await tmdbGet("/discover/movie", {
+    sort_by: "vote_average.desc",
+    "vote_count.gte": 200,
+    "vote_count.lte": 3000,
+    "vote_average.gte": 7.5,
+    page: 1,
+  });
+  return (data.results || []).slice(0, 6).map(normaliseMovie);
+}
+
+/**
+ * Flexible discover with combined filters:
+ * genreId, language, decadeGte, decadeLte, year, keywordIds, runtimeLte, runtimeGte
+ */
+async function discoverWithFilters({ genreId, iso, decadeGte, decadeLte, year, keywordIds, sortBy } = {}) {
+  const params = { page: 1, sort_by: sortBy || "popularity.desc" };
+  if (genreId) params.with_genres = String(genreId);
+  if (iso) params.with_original_language = iso;
+  if (decadeGte) params["primary_release_date.gte"] = decadeGte;
+  if (decadeLte) params["primary_release_date.lte"] = decadeLte;
+  if (year) params.primary_release_year = year;
+  if (keywordIds) {
+    const ids = Array.isArray(keywordIds) ? keywordIds.join("|") : String(keywordIds);
+    params.with_keywords = ids;
+  }
+  const data = await tmdbGet("/discover/movie", params);
+  return (data.results || []).slice(0, 6).map(normaliseMovie);
+}
+
+/**
+ * Search for a director/crew by name, then return their movies.
+ */
+async function searchDirector(directorName) {
+  if (!directorName || directorName.trim().length === 0) return { director: null, movies: [] };
+
+  const data = await tmdbGet("/search/person", { query: directorName.trim(), page: 1 });
+  const people = (data.results || []);
+
+  // Find someone who has directing credits
+  let director = null;
+  let movies = [];
+
+  for (const person of people.slice(0, 3)) {
+    const creditsData = await tmdbGet(`/person/${person.id}/movie_credits`);
+    const directedMovies = (creditsData.crew || [])
+      .filter((m) => m.job === "Director" && m.poster_path && m.vote_count > 10)
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+      .slice(0, 6)
+      .map(normaliseMovie);
+
+    if (directedMovies.length > 0) {
+      director = { id: person.id, name: person.name };
+      movies = directedMovies;
+      break;
+    }
+  }
+
+  return { director, movies };
+}
+
 /* ═══════════════════════════════════════════════════════════════
    NEW: SIMILAR MOVIES (Recommendations)
    ═══════════════════════════════════════════════════════════════ */
@@ -459,12 +524,15 @@ async function searchActor(actorName) {
 module.exports = {
   discoverByGenre,
   discoverByKeywords,
+  discoverWithFilters,
   searchByTitle,
   searchByKeyword,
   smartSearch,
   getTrending,
   getTopRated,
+  getHiddenGems,
   getFullMovieDetails,
   getSimilarByTitle,
   searchActor,
+  searchDirector,
 };

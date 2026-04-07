@@ -5,14 +5,18 @@ import Message from "./Message";
 const SUGGESTIONS = [
   "Suggest a comedy 😂",
   "I feel excited 🔥",
-  "Search for Inception",
+  "Directed by Nolan 🎥",
+  "90s action movies 📽️",
+  "Korean films 🇰🇷",
+  "Hidden gems 💎",
   "Movies about space 🚀",
   "Something like Interstellar ✨",
-  "Show me horror movies 👻",
   "Movies by Tom Hanks 🌟",
-  "Trending movies 📈",
-  "Something nostalgic 💭",
-  "I feel adventurous 🗺️",
+  "Top rated thrillers ⭐",
+  "Bollywood hits 🕺",
+  "Coming of age films 🎓",
+  "Horror movies from 2020 👻",
+  "Road trip movies 🚗",
 ];
 
 export default function ChatBox({ isInWatchlist, onToggleWatchlist, onMovieClick }) {

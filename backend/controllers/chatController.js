@@ -12,22 +12,16 @@ function buildSearchReply(searchMeta) {
   switch (searchType) {
     case "corrected":
       return `Showing results for "${correctedQuery}" (you searched: "${originalQuery}") ✨🔍`;
-
     case "phonetic":
       return `Did you mean "${correctedQuery}"? Here's what I found 🔎✨`;
-
     case "fuzzy":
       return `No exact match for "${originalQuery}", showing similar results 🔎`;
-
     case "keyword_match":
       return `Here are movies matching "${originalQuery}" 🎯`;
-
     case "recommendation":
       return `Movies similar to your search 🎬✨`;
-
     case "trending_fallback":
       return `I couldn't find a match for "${originalQuery}", but here are some trending movies you might enjoy! 🔥`;
-
     case "exact":
     default:
       if (wasCorrected && correctedQuery !== originalQuery) {
@@ -65,10 +59,7 @@ async function handleChat(req, res) {
         reply = movies.length
           ? `Here are some popular ${intent.genre} movies for you! 🎬`
           : BOT_MESSAGES.fallbackTrending;
-        // Never-empty guarantee
-        if (movies.length === 0) {
-          movies = await tmdb.getTrending();
-        }
+        if (movies.length === 0) movies = await tmdb.getTrending();
         break;
 
       case "mood":
@@ -76,10 +67,89 @@ async function handleChat(req, res) {
         reply = movies.length
           ? `Since you're feeling ${intent.mood}, here are some movies you might enjoy! 🍿`
           : BOT_MESSAGES.fallbackTrending;
-        if (movies.length === 0) {
-          movies = await tmdb.getTrending();
+        if (movies.length === 0) movies = await tmdb.getTrending();
+        break;
+
+      case "top_rated": {
+        movies = await tmdb.getTopRated(intent.genreId);
+        reply = intent.genreId
+          ? `Here are the highest-rated movies in that genre! ⭐🎬`
+          : `Here are the highest-rated movies of all time! ⭐🏆`;
+        if (movies.length === 0) movies = await tmdb.getTrending();
+        break;
+      }
+
+      case "hidden_gems": {
+        movies = await tmdb.getHiddenGems();
+        reply = `Here are some hidden gems you may have missed! 💎🎬`;
+        if (movies.length === 0) movies = await tmdb.getTrending();
+        break;
+      }
+
+      case "director": {
+        const dirResult = await tmdb.searchDirector(intent.directorName);
+        movies = dirResult.movies;
+        if (dirResult.director && movies.length > 0) {
+          reply = `Here are top films directed by ${dirResult.director.name}! 🎬🎥`;
+        } else {
+          const actorResult = await tmdb.searchActor(intent.directorName);
+          movies = actorResult.movies;
+          if (actorResult.actor && movies.length > 0) {
+            reply = `Here are movies featuring ${actorResult.actor.name}! 🌟`;
+          } else {
+            const searchResult = await tmdb.smartSearch(intent.directorName);
+            movies = searchResult.movies;
+            searchMeta = searchResult.searchMeta;
+            reply = movies.length
+              ? `Here's what I found for "${intent.directorName}" 🔍`
+              : BOT_MESSAGES.fallbackTrending;
+            if (movies.length === 0) movies = await tmdb.getTrending();
+          }
         }
         break;
+      }
+
+      case "language": {
+        movies = await tmdb.discoverWithFilters({
+          iso: intent.iso,
+          genreId: intent.genreId,
+          decadeGte: intent.decade?.gte,
+          decadeLte: intent.decade?.lte,
+        });
+        const langLabel = intent.lang.charAt(0).toUpperCase() + intent.lang.slice(1);
+        reply = movies.length
+          ? `Here are some great ${langLabel} movies! 🌍🎬`
+          : BOT_MESSAGES.fallbackTrending;
+        if (movies.length === 0) movies = await tmdb.getTrending();
+        break;
+      }
+
+      case "decade": {
+        movies = await tmdb.discoverWithFilters({
+          genreId: intent.genreId,
+          keywordIds: intent.keywordIds,
+          decadeGte: intent.decade.gte,
+          decadeLte: intent.decade.lte,
+        });
+        const decadeLabel = intent.decade.gte ? intent.decade.gte.slice(0, 4) + "s" : "that era";
+        reply = movies.length
+          ? `Here are some great movies from the ${decadeLabel}! 📽️`
+          : BOT_MESSAGES.fallbackTrending;
+        if (movies.length === 0) movies = await tmdb.getTrending();
+        break;
+      }
+
+      case "year": {
+        movies = await tmdb.discoverWithFilters({
+          genreId: intent.genreId,
+          year: intent.year,
+        });
+        reply = movies.length
+          ? `Here are popular movies from ${intent.year}! 📅🎬`
+          : BOT_MESSAGES.fallbackTrending;
+        if (movies.length === 0) movies = await tmdb.getTrending();
+        break;
+      }
 
       case "actor": {
         const actorResult = await tmdb.searchActor(intent.actorName);
@@ -87,22 +157,18 @@ async function handleChat(req, res) {
         if (actorResult.actor && movies.length > 0) {
           reply = `Here are popular movies featuring ${actorResult.actor.name}! 🌟`;
         } else {
-          // Fallback: try as a title search, then trending
           const searchResult = await tmdb.smartSearch(intent.actorName);
           movies = searchResult.movies;
           searchMeta = searchResult.searchMeta;
           reply = movies.length
             ? `I couldn't find an actor named "${intent.actorName}", but here are some related movies 🔎`
             : BOT_MESSAGES.fallbackTrending;
-          if (movies.length === 0) {
-            movies = await tmdb.getTrending();
-          }
+          if (movies.length === 0) movies = await tmdb.getTrending();
         }
         break;
       }
 
       case "keyword": {
-        // Theme-based search (space, zombies, robots, etc.)
         if (intent.keywordIds) {
           movies = await tmdb.discoverByKeywords(intent.keywordIds);
         }
@@ -112,16 +178,13 @@ async function handleChat(req, res) {
         if (movies.length > 0) {
           reply = `Here are movies about "${intent.keyword}" 🎯🎬`;
         } else {
-          // Fallback to regular search, then trending
           const searchResult = await tmdb.smartSearch(intent.keyword);
           movies = searchResult.movies;
           searchMeta = searchResult.searchMeta;
           reply = movies.length
             ? buildSearchReply(searchResult.searchMeta)
             : BOT_MESSAGES.fallbackTrending;
-          if (movies.length === 0) {
-            movies = await tmdb.getTrending();
-          }
+          if (movies.length === 0) movies = await tmdb.getTrending();
         }
         break;
       }
@@ -138,16 +201,13 @@ async function handleChat(req, res) {
             searchType: "recommendation",
           };
         } else {
-          // Fallback: try smart search
           const searchResult = await tmdb.smartSearch(intent.movieTitle);
           movies = searchResult.movies;
           searchMeta = searchResult.searchMeta;
           reply = movies.length
             ? `I couldn't find an exact match, but here are some results for "${intent.movieTitle}" 🔎`
             : BOT_MESSAGES.fallbackTrending;
-          if (movies.length === 0) {
-            movies = await tmdb.getTrending();
-          }
+          if (movies.length === 0) movies = await tmdb.getTrending();
         }
         break;
       }
@@ -156,26 +216,17 @@ async function handleChat(req, res) {
         const result = await tmdb.smartSearch(intent.query);
         movies = result.movies;
         searchMeta = result.searchMeta;
-        reply = movies.length
-          ? buildSearchReply(searchMeta)
-          : BOT_MESSAGES.fallbackTrending;
-        // smartSearch already guarantees results via trending fallback,
-        // but double-check just in case
-        if (movies.length === 0) {
-          movies = await tmdb.getTrending();
-        }
+        reply = movies.length ? buildSearchReply(searchMeta) : BOT_MESSAGES.fallbackTrending;
+        if (movies.length === 0) movies = await tmdb.getTrending();
         break;
       }
 
       case "trending":
         movies = await tmdb.getTrending();
-        reply = movies.length
-          ? "Here are this week's trending movies! 🔥"
-          : BOT_MESSAGES.fallbackTrending;
+        reply = movies.length ? "Here are this week's trending movies! 🔥" : BOT_MESSAGES.fallbackTrending;
         break;
 
       default:
-        // Even for unknown intents, show trending movies
         movies = await tmdb.getTrending();
         reply = movies.length
           ? BOT_MESSAGES.unknown + "\n\nHere's what's trending right now! 🔥"
@@ -189,7 +240,6 @@ async function handleChat(req, res) {
     });
   } catch (err) {
     console.error("Chat handler error:", err);
-    // Even on error, try to return trending movies
     try {
       const trendingMovies = await tmdb.getTrending();
       return res.status(200).json({
