@@ -4,7 +4,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "https://moviechat-backend.onre
 
 const client = axios.create({
   baseURL: API_BASE,
-  timeout: 15000,
+  timeout: 60000, // Increased to 60s because Render free-tier sometimes takes 50s to wake up!
   headers: { "Content-Type": "application/json" },
 });
 
