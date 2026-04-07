@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: moviechat_backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # These can override the .env file if uncommented and supplied in host
+      # - TMDB_API_KEY=${TMDB_API_KEY}
+      - PORT=5000
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Note: If your backend is deployed, you should replace this with your public domain 
+        # For local Docker, standard localhost works because the browser interacts with it from the host machine
+        - VITE_API_URL=http://localhost:5000/api
+    container_name: moviechat_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
