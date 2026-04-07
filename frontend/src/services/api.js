@@ -1,6 +1,11 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://moviechat-backend.onrender.com/api";
+let apiEnv = import.meta.env.VITE_API_URL || "https://moviechat-backend.onrender.com/api";
+// Fix for missing /api in Vercel/Render env vars
+if (!apiEnv.endsWith("/api")) {
+  apiEnv = apiEnv.replace(/\/$/, "") + "/api";
+}
+const API_BASE = apiEnv;
 
 const client = axios.create({
   baseURL: API_BASE,
