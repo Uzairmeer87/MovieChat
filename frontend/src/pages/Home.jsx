@@ -18,25 +18,70 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen flex flex-col app-bg dot-grid relative">
+    <div className="h-screen flex flex-col app-bg dot-grid relative overflow-hidden">
+
+      {/* ── Floating Ambient Orbs ─────────────────────────────── */}
+      <div
+        className="orb"
+        style={{
+          width: "500px", height: "500px",
+          background: "radial-gradient(circle, rgba(99,102,241,0.08), transparent 70%)",
+          top: "-100px", left: "-150px",
+          animationDuration: "10s",
+        }}
+      />
+      <div
+        className="orb"
+        style={{
+          width: "400px", height: "400px",
+          background: "radial-gradient(circle, rgba(168,85,247,0.07), transparent 70%)",
+          bottom: "-50px", right: "-100px",
+          animationDuration: "14s",
+          animationDelay: "-5s",
+        }}
+      />
+      <div
+        className="orb"
+        style={{
+          width: "300px", height: "300px",
+          background: "radial-gradient(circle, rgba(236,72,153,0.05), transparent 70%)",
+          top: "40%", right: "30%",
+          animationDuration: "18s",
+          animationDelay: "-8s",
+        }}
+      />
+
       {/* ── Header ───────────────────────── */}
       <header className="header-glass header-glow flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 relative z-10">
         <div className="flex items-center gap-3">
-          <span className="text-2xl animate-pulse-glow rounded-full p-1">🎬</span>
-          <h1 className="text-xl font-bold gradient-text tracking-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
-            Movie Chatbot
-          </h1>
+          {/* 3D Logo Box */}
+          <div className="logo-3d">
+            <span className="text-lg">🎬</span>
+          </div>
+          <div>
+            <h1
+              className="text-lg sm:text-xl font-bold gradient-text animate-neon tracking-tight"
+              style={{ fontFamily: "Outfit, sans-serif" }}
+            >
+              MovieChat
+            </h1>
+            <div className="flex items-center gap-1.5 -mt-0.5">
+              <div className="status-indicator" />
+              <span className="text-[10px] text-slate-500 font-medium">AI Powered</span>
+            </div>
+          </div>
         </div>
 
         {/* Watchlist toggle */}
         <button
           onClick={() => setWatchlistOpen(true)}
-          className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm text-slate-300 hover:text-white glass hover:border-indigo-500/30 transition-all cursor-pointer group"
+          className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm text-slate-300 hover:text-white glass hover:border-indigo-500/40 transition-all cursor-pointer group"
+          style={{ transform: "translateZ(0)" }}
         >
-          <span className="group-hover:scale-110 transition-transform">🎯</span>
-          <span className="hidden sm:inline">Watchlist</span>
+          <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">🎯</span>
+          <span className="hidden sm:inline font-medium">Watchlist</span>
           {watchlist.length > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-500/40">
+            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/50 animate-pulse-glow">
               {watchlist.length}
             </span>
           )}

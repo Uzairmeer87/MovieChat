@@ -1,14 +1,3 @@
-/**
- * WatchlistPanel — slide-out drawer showing saved movies.
- *
- * Props:
- *   isOpen          — boolean
- *   onClose         — callback
- *   watchlist       — array of movie objects
- *   onRemoveMovie   — callback(movieId)
- *   onClear         — callback
- *   onMovieClick    — callback(movieId)
- */
 export default function WatchlistPanel({
   isOpen,
   onClose,
@@ -19,86 +8,142 @@ export default function WatchlistPanel({
 }) {
   return (
     <>
-      {/* Overlay */}
+      {/* ── Overlay ── */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 z-40 transition-opacity"
+          style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
           onClick={onClose}
         />
       )}
 
-      {/* Panel */}
+      {/* ── Sliding Panel ── */}
       <div
         className={`fixed top-0 right-0 z-50 h-full w-full max-w-sm transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="h-full flex flex-col watchlist-panel border-l border-white/10">
-          {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🎯</span>
-              <h2 className="text-lg font-bold text-white">Watchlist</h2>
-              {watchlist.length > 0 && (
-                <span className="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">
-                  {watchlist.length}
-                </span>
-              )}
+        <div
+          className="h-full flex flex-col watchlist-panel"
+          style={{ borderLeft: "1px solid rgba(255,255,255,0.06)" }}
+        >
+          {/* ── Panel Header ── */}
+          <div
+            className="flex items-center justify-between px-5 py-4"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-sm"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(168,85,247,0.1))",
+                  border: "1px solid rgba(99,102,241,0.2)",
+                }}
+              >
+                🎯
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+                  Watchlist
+                </h2>
+                {watchlist.length > 0 && (
+                  <p className="text-[10px] text-slate-500">{watchlist.length} saved</p>
+                )}
+              </div>
             </div>
+
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-all cursor-pointer"
+              className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-white transition-all cursor-pointer"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
               aria-label="Close watchlist"
             >
               ✕
             </button>
           </div>
 
-          {/* Movie list */}
+          {/* ── Movie list ── */}
           <div className="flex-1 overflow-y-auto p-4 chat-scroll">
             {watchlist.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center text-slate-500">
-                <span className="text-5xl mb-4 opacity-50">🎬</span>
-                <p className="text-sm font-medium text-slate-400">Your watchlist is empty</p>
-                <p className="text-xs mt-1.5 max-w-[200px]">
-                  Click the bookmark icon on any movie card to save it here
-                </p>
+              <div className="flex flex-col items-center justify-center h-full text-center gap-3">
+                <div
+                  className="w-16 h-16 flex items-center justify-center rounded-2xl text-3xl"
+                  style={{
+                    background: "rgba(15,20,40,0.5)",
+                    border: "1px solid rgba(255,255,255,0.05)",
+                  }}
+                >
+                  🎬
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-400">Your watchlist is empty</p>
+                  <p className="text-xs text-slate-600 mt-1 max-w-[200px]">
+                    Tap the ☆ on any movie card to save it here
+                  </p>
+                </div>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {watchlist.map((movie, i) => (
                   <div
                     key={movie.id}
-                    className="group flex gap-3 p-2 rounded-xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-white/8 transition-all cursor-pointer animate-fade-in"
-                    style={{ animationDelay: `${i * 50}ms` }}
+                    className="watchlist-item group flex gap-3 p-2.5 rounded-xl cursor-pointer animate-fade-in"
+                    style={{
+                      background: "rgba(12,18,38,0.5)",
+                      border: "1px solid rgba(255,255,255,0.05)",
+                      animationDelay: `${i * 50}ms`,
+                      transition: "all 0.25s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(99,102,241,0.3)";
+                      e.currentTarget.style.background = "rgba(18,25,55,0.6)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
+                      e.currentTarget.style.background = "rgba(12,18,38,0.5)";
+                    }}
                     onClick={() => onMovieClick(movie.id)}
                   >
+                    {/* Poster */}
                     {movie.poster ? (
-                      <img
-                        src={movie.poster}
-                        alt={movie.title}
-                        className="w-14 h-20 object-cover rounded-lg flex-shrink-0"
-                      />
+                      <div
+                        className="flex-shrink-0 rounded-lg overflow-hidden"
+                        style={{ border: "1px solid rgba(255,255,255,0.07)" }}
+                      >
+                        <img
+                          src={movie.poster}
+                          alt={movie.title}
+                          className="w-12 h-[68px] object-cover block"
+                        />
+                      </div>
                     ) : (
-                      <div className="w-14 h-20 bg-slate-800 rounded-lg flex items-center justify-center text-slate-500 text-xs flex-shrink-0">
+                      <div
+                        className="w-12 h-[68px] rounded-lg flex-shrink-0 flex items-center justify-center text-slate-600 text-sm"
+                        style={{ background: "rgba(15,20,40,0.6)" }}
+                      >
                         🎬
                       </div>
                     )}
+
+                    {/* Info */}
                     <div className="flex-1 min-w-0 py-0.5">
-                      <h4 className="text-sm font-semibold text-white truncate group-hover:text-indigo-300 transition-colors">
+                      <h4 className="text-xs font-semibold text-white truncate group-hover:text-indigo-300 transition-colors">
                         {movie.title}
                       </h4>
-                      <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
+                      <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-500">
                         <span>{movie.year}</span>
                         <span className="text-yellow-400">★ {movie.rating?.toFixed(1)}</span>
                       </div>
                     </div>
+
+                    {/* Remove */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onRemoveMovie(movie.id);
                       }}
-                      className="self-center w-7 h-7 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-all cursor-pointer"
+                      className="self-center w-7 h-7 flex items-center justify-center rounded-full text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                      style={{ background: "rgba(239,68,68,0.08)" }}
                       aria-label="Remove from watchlist"
                     >
                       ✕
@@ -109,14 +154,27 @@ export default function WatchlistPanel({
             )}
           </div>
 
-          {/* Footer — Clear all */}
+          {/* ── Footer ── */}
           {watchlist.length > 0 && (
-            <div className="p-4 border-t border-white/10">
+            <div className="p-4" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
               <button
                 onClick={onClear}
-                className="w-full py-2.5 text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/30 rounded-xl transition-all cursor-pointer"
+                className="w-full py-2.5 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                style={{
+                  background: "rgba(239,68,68,0.06)",
+                  border: "1px solid rgba(239,68,68,0.15)",
+                  color: "#f87171",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(239,68,68,0.12)";
+                  e.currentTarget.style.borderColor = "rgba(239,68,68,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(239,68,68,0.06)";
+                  e.currentTarget.style.borderColor = "rgba(239,68,68,0.15)";
+                }}
               >
-                Clear Watchlist
+                Clear All
               </button>
             </div>
           )}
