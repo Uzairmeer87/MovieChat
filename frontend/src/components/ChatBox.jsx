@@ -95,7 +95,7 @@ export default function ChatBox({ isInWatchlist, onToggleWatchlist, onMovieClick
   return (
     <div className="flex flex-col h-full">
       {/* ── Message area ─────────────────── */}
-      <div className="flex-1 overflow-y-auto p-4 chat-scroll">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 chat-scroll">
         {messages.map((m, i) => (
           <Message
             key={i}
@@ -142,8 +142,8 @@ export default function ChatBox({ isInWatchlist, onToggleWatchlist, onMovieClick
       )}
 
       {/* ── Input bar ────────────────────── */}
-      <div className="p-4 relative z-10">
-        <div className="flex gap-2.5 max-w-3xl mx-auto">
+      <div className="p-3 sm:p-4 relative z-10">
+        <div className="flex gap-2 sm:gap-2.5 max-w-3xl mx-auto">
           <input
             id="chat-input"
             type="text"
@@ -152,13 +152,13 @@ export default function ChatBox({ isInWatchlist, onToggleWatchlist, onMovieClick
             onKeyDown={handleKeyDown}
             placeholder="Ask me about movies…"
             disabled={loading}
-            className="flex-1 input-glass rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none disabled:opacity-40"
+            className="flex-1 input-glass rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-white placeholder-slate-500 outline-none disabled:opacity-40"
           />
           <button
             id="send-button"
             onClick={() => handleSend()}
             disabled={loading || !input.trim()}
-            className="send-btn text-white rounded-xl px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed cursor-pointer"
+            className="send-btn text-white rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-semibold disabled:cursor-not-allowed cursor-pointer shrink-0"
           >
             Send
           </button>

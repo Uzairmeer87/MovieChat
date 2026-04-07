@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col app-bg dot-grid relative">
       {/* ── Header ───────────────────────── */}
-      <header className="header-glass header-glow flex items-center justify-between px-5 py-3.5 relative z-10">
+      <header className="header-glass header-glow flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 relative z-10">
         <div className="flex items-center gap-3">
           <span className="text-2xl animate-pulse-glow rounded-full p-1">🎬</span>
           <h1 className="text-xl font-bold gradient-text tracking-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
@@ -31,7 +31,7 @@ export default function Home() {
         {/* Watchlist toggle */}
         <button
           onClick={() => setWatchlistOpen(true)}
-          className="relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm text-slate-300 hover:text-white glass hover:border-indigo-500/30 transition-all cursor-pointer group"
+          className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm text-slate-300 hover:text-white glass hover:border-indigo-500/30 transition-all cursor-pointer group"
         >
           <span className="group-hover:scale-110 transition-transform">🎯</span>
           <span className="hidden sm:inline">Watchlist</span>

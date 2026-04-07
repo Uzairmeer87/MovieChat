@@ -89,6 +89,7 @@ export default function MovieModal({ movieId, onClose, isInWatchlist, onToggleWa
                 <img
                   src={movie.backdrop}
                   alt={movie.title}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -198,6 +199,7 @@ export default function MovieModal({ movieId, onClose, isInWatchlist, onToggleWa
                           <img
                             src={c.profile}
                             alt={c.name}
+                            loading="lazy"
                             className="w-full aspect-[2/3] object-cover rounded-lg border border-white/10 group-hover:border-indigo-500/50 transition-all"
                           />
                         ) : (

@@ -7,6 +7,7 @@ export default function MovieCard({ movie, isInWatchlist, onToggleWatchlist, onC
           <img
             src={movie.poster}
             alt={movie.title}
+            loading="lazy"
             className="w-24 h-36 object-cover rounded-l-xl"
           />
         </div>

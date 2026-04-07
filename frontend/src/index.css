@@ -109,6 +109,7 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow, border-color;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -176,6 +177,7 @@ h1, h2, h3, h4, h5, h6 {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow, background-color, border-color;
 }
 
 .chip:hover {

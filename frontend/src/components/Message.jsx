@@ -84,7 +84,7 @@ export default function Message({
       }`}
     >
       <div
-        className={`max-w-[85%] md:max-w-[75%] ${
+        className={`max-w-[90%] sm:max-w-[85%] md:max-w-[75%] lg:max-w-[70%] ${
           isUser
             ? "msg-user text-white rounded-2xl rounded-br-md"
             : "msg-bot text-slate-100 rounded-2xl rounded-bl-md"
