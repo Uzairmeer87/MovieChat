@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    // Ensure you have NodeJS plugin configured in Jenkins with the name 'node'
-    // If you already have node installed on the agent, you can remove the tools section.
-    tools {
-        nodejs 'node'
-    }
 
     stages {
         stage('Install Dependencies') {
