@@ -23,8 +23,7 @@ const COMMON_CORRECTIONS = {
   westrn: "western", westen: "western", westerm: "western",
 
   // ── Popular movie title typos ────────────────────────────
-  avnger: "avengers", avengrs: "avengers", avngers: "avengers", avengerr: "avengers",
-  avengr: "avengers", avengrs: "avengers", avnger: "avengers", avanger: "avengers",
+  avngr: "avengers", avngers: "avengers", avengerr: "avengers", avanger: "avengers",
   batmn: "batman", baman: "batman", batmam: "batman", btman: "batman", batmna: "batman",
   supermn: "superman", suprman: "superman", supperman: "superman", supaman: "superman",
   spidrman: "spiderman", spdrman: "spiderman", spdierman: "spiderman",
@@ -143,110 +142,17 @@ function fixKnownTypos(text) {
   return corrected.join(" ");
 }
 
-/* ─── Soundex Phonetic Matching ───────────────────────────── */
-
 /**
- * Simple Soundex implementation for phonetic matching.
- * Encodes a word into a 4-character code based on how it sounds.
- */
-function soundex(word) {
-  if (!word || word.length === 0) return "";
-  const w = word.toUpperCase();
-  const map = {
-    B: 1, F: 1, P: 1, V: 1,
-    C: 2, G: 2, J: 2, K: 2, Q: 2, S: 2, X: 2, Z: 2,
-    D: 3, T: 3,
-    L: 4,
-    M: 5, N: 5,
-    R: 6,
-  };
-
-  let code = w[0];
-  let lastCode = map[w[0]] || 0;
-
-  for (let i = 1; i < w.length && code.length < 4; i++) {
-    const c = map[w[i]] || 0;
-    if (c && c !== lastCode) {
-      code += c;
-    }
-    lastCode = c || lastCode;
-    // Skip vowels/H/W but update lastCode only for mapped chars
-    if (c === 0) lastCode = 0;
-  }
-
-  return (code + "000").slice(0, 4);
-}
-
-/**
- * Find phonetically similar words from vocabulary.
- */
-function phoneticMatch(word, vocabulary) {
-  if (word.length <= 2) return word;
-  const targetSoundex = soundex(word);
-
-  let bestMatch = word;
-  let bestScore = Infinity;
-
-  for (const candidate of vocabulary) {
-    if (soundex(candidate) === targetSoundex) {
-      const d = distance(word, candidate);
-      if (d < bestScore) {
-        bestScore = d;
-        bestMatch = candidate;
-      }
-    }
-  }
-
-  // Only return phonetic match if it's reasonably close
-  return bestScore <= 4 ? bestMatch : word;
-}
-
-/**
- * Attempt phonetic correction on entire query.
+ * Phonetic correction stub — always returns unchanged so the
+ * smartSearch phonetic step is a no-op. Soundex removed: the
+ * Levenshtein fuzzy path already covers these cases.
  */
 function phoneticCorrect(query) {
-  const words = normalise(query).split(/\s+/);
-  const corrected = words.map((w) => {
-    if (w.length <= 2) return w;
-    return phoneticMatch(w, SEARCH_VOCABULARY);
-  });
-  const result = corrected.join(" ");
-  return {
-    corrected: result,
-    wasCorrected: result !== normalise(query),
-  };
+  const q = normalise(query);
+  return { corrected: q, wasCorrected: false };
 }
 
-/* ─── N-gram Similarity ──────────────────────────────────── */
 
-/**
- * Generate character n-grams (bigrams by default) from a string.
- */
-function ngrams(str, n = 2) {
-  const s = normalise(str);
-  const grams = new Set();
-  for (let i = 0; i <= s.length - n; i++) {
-    grams.add(s.substring(i, i + n));
-  }
-  return grams;
-}
-
-/**
- * Calculate n-gram similarity between two strings (0–1 scale).
- * 1 = identical, 0 = completely different.
- */
-function ngramSimilarity(str1, str2, n = 2) {
-  const grams1 = ngrams(str1, n);
-  const grams2 = ngrams(str2, n);
-  if (grams1.size === 0 || grams2.size === 0) return 0;
-
-  let intersection = 0;
-  for (const g of grams1) {
-    if (grams2.has(g)) intersection++;
-  }
-
-  return (2 * intersection) / (grams1.size + grams2.size);
-}
 
 /* ─── Word-level Fuzzy Correction ────────────────────────── */
 
@@ -335,8 +241,7 @@ function rankBySimilarity(movies, query) {
       const dist = distance(q, title);
       const containsBonus = title.includes(q) ? -100 : 0;
       const startsWithBonus = title.startsWith(q) ? -200 : 0;
-      const ngramBonus = ngramSimilarity(q, title) * -50;
-      return { ...movie, _score: dist + containsBonus + startsWithBonus + ngramBonus };
+      return { ...movie, _score: dist + containsBonus + startsWithBonus };
     })
     .sort((a, b) => a._score - b._score)
     .map(({ _score, ...movie }) => movie);
@@ -378,6 +283,4 @@ module.exports = {
   phoneticCorrect,
   rankBySimilarity,
   generateFallbackQueries,
-  ngramSimilarity,
-  soundex,
 };

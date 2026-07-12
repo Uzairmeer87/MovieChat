@@ -236,7 +236,7 @@ async function handleChat(req, res) {
     return res.json({
       reply,
       movies,
-      searchMeta: searchMeta || null,
+      searchMeta,
     });
   } catch (err) {
     console.error("Chat handler error:", err);

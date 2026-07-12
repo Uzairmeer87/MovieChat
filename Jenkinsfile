@@ -1,26 +1,18 @@
 pipeline {
     agent any
 
-
     stages {
         stage('Install Dependencies') {
             steps {
                 script {
+                    def run = { cmd -> isUnix() ? sh(cmd) : bat(cmd) }
                     dir('backend') {
                         echo 'Installing backend dependencies...'
-                        if (isUnix()) {
-                            sh 'npm install'
-                        } else {
-                            bat 'npm install'
-                        }
+                        run('npm install')
                     }
                     dir('frontend') {
                         echo 'Installing frontend dependencies...'
-                        if (isUnix()) {
-                            sh 'npm install'
-                        } else {
-                            bat 'npm install'
-                        }
+                        run('npm install')
                     }
                 }
             }
@@ -29,13 +21,10 @@ pipeline {
         stage('Frontend Lint') {
             steps {
                 script {
+                    def run = { cmd -> isUnix() ? sh(cmd) : bat(cmd) }
                     dir('frontend') {
                         echo 'Running frontend linter...'
-                        if (isUnix()) {
-                            sh 'npm run lint'
-                        } else {
-                            bat 'npm run lint'
-                        }
+                        run('npm run lint')
                     }
                 }
             }
@@ -44,13 +33,10 @@ pipeline {
         stage('Frontend Build') {
             steps {
                 script {
+                    def run = { cmd -> isUnix() ? sh(cmd) : bat(cmd) }
                     dir('frontend') {
                         echo 'Building frontend...'
-                        if (isUnix()) {
-                            sh 'npm run build'
-                        } else {
-                            bat 'npm run build'
-                        }
+                        run('npm run build')
                     }
                 }
             }
@@ -59,12 +45,9 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+                    def run = { cmd -> isUnix() ? sh(cmd) : bat(cmd) }
                     echo 'Building docker containers...'
-                    if (isUnix()) {
-                        sh 'docker-compose build'
-                    } else {
-                        bat 'docker-compose build'
-                    }
+                    run('docker-compose build')
                 }
             }
         }

@@ -113,7 +113,7 @@ function detectIntent(message) {
     /(?:search\s+(?:for\s+)?|find\s+|look\s+up\s+|show\s+me\s+)(.+)/i
   );
   if (searchMatch) {
-    let query = searchMatch[1].replace(/\b(movies?|films?)\\b/gi, "").trim();
+    let query = searchMatch[1].replace(/\b(movies?|films?)\b/gi, "").trim();
     if (query.length > 1) {
       const kwKey = Object.keys(KEYWORD_MAP).find((k) => query.includes(k));
       if (kwKey) return { type: "keyword", keyword: kwKey, keywordIds: KEYWORD_MAP[kwKey] };
@@ -156,7 +156,7 @@ function detectIntent(message) {
   // 11. Actor search
   const actorPatterns = [
     /(?:movies?\s+by|movies?\s+with|movies?\s+starring|films?\s+by|films?\s+with|films?\s+starring)\s+(.+)/i,
-    /(?:starring|acted\s+by)\\s+(.+)/i,
+    /(?:starring|acted\s+by)\s+(.+)/i,
     /(.+?)(?:'s\s+movies?|'s\s+films?)/i,
   ];
   for (const pattern of actorPatterns) {

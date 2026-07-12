@@ -1,4 +1,4 @@
-const https = require("https");
+const axios = require("axios");
 const config = require("../config");
 const {
   correctQuery,
@@ -30,58 +30,27 @@ function normaliseMovie(movie) {
   };
 }
 
+const tmdbClient = axios.create({
+  baseURL: config.tmdbBaseUrl,
+  timeout: config.requestTimeout,
+});
+
 /**
- * Make a GET request to TMDB using Node's native https module.
+ * Make a GET request to TMDB using axios.
  */
-function tmdbGet(endpoint, params = {}) {
-  return new Promise((resolve, reject) => {
-    params.api_key = config.tmdbApiKey;
-
-    const query = Object.entries(params)
-      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-      .join("&");
-
-    const url = `${config.tmdbBaseUrl}${endpoint}?${query}`;
-
-    const req = https.get(url, { timeout: config.requestTimeout }, (res) => {
-      let body = "";
-      res.on("data", (chunk) => (body += chunk));
-      res.on("end", () => {
-        try {
-          const data = JSON.parse(body);
-
-          if (res.statusCode === 401) {
-            console.error("TMDB API error: 401 Unauthorized — check your API key in .env");
-            return resolve({ results: [] });
-          }
-          if (res.statusCode === 429) {
-            console.error("TMDB API rate limit exceeded. Try again shortly.");
-            return resolve({ results: [] });
-          }
-          if (res.statusCode >= 400) {
-            console.error(`TMDB API error: ${res.statusCode} for ${endpoint}`);
-            return resolve({ results: [] });
-          }
-
-          resolve(data);
-        } catch (parseErr) {
-          console.error("TMDB response parse error:", parseErr.message);
-          resolve({ results: [] });
-        }
-      });
+async function tmdbGet(endpoint, params = {}) {
+  try {
+    const { data } = await tmdbClient.get(endpoint, {
+      params: { ...params, api_key: config.tmdbApiKey },
     });
-
-    req.on("error", (err) => {
-      console.error(`TMDB request error for ${endpoint}: ${err.message}`);
-      resolve({ results: [] });
-    });
-
-    req.on("timeout", () => {
-      req.destroy();
-      console.error(`TMDB request timed out for ${endpoint}`);
-      resolve({ results: [] });
-    });
-  });
+    return data;
+  } catch (err) {
+    const status = err.response?.status;
+    if (status === 401) console.error("TMDB API error: 401 Unauthorized — check your API key in .env");
+    else if (status === 429) console.error("TMDB API rate limit exceeded. Try again shortly.");
+    else console.error(`TMDB request error for ${endpoint}: ${err.message}`);
+    return { results: [] };
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -384,13 +353,7 @@ function dedup(movies) {
   });
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   SIMPLE TITLE SEARCH (backward compatibility)
-   ═══════════════════════════════════════════════════════════════ */
 
-async function searchByTitle(query) {
-  return rawSearch(query, 6);
-}
 
 /* ═══════════════════════════════════════════════════════════════
    MOVIE DETAILS, CREDITS, VIDEOS
@@ -525,7 +488,6 @@ module.exports = {
   discoverByGenre,
   discoverByKeywords,
   discoverWithFilters,
-  searchByTitle,
   searchByKeyword,
   smartSearch,
   getTrending,
