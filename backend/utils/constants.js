@@ -76,33 +76,10 @@ const MOOD_MAP = {
  * Multiple IDs per keyword to cast a wider net.
  */
 const KEYWORD_MAP = {
-  space: [1014, 4565],              // space, outer space
-  robots: [9831, 9951],             // robot, artificial intelligence
-  ai: [9951, 310],                  // artificial intelligence, technology
-  zombies: [12377, 6152],           // zombie, undead
-  aliens: [9882, 1014],             // alien, space
-  vampires: [3133, 162846],         // vampire, vampires
-  dragons: [11237, 14],             // dragon, fantasy
-  pirates: [5765, 270],             // pirate, ocean
-  ninjas: [1596, 779],              // ninja, martial arts
-  samurai: [11479, 779],            // samurai, martial arts
-  cowboys: [6027, 10195],           // cowboy, western
-  heist: [10291, 15062],            // heist, robbery
-  medieval: [161222, 177912],       // medieval, middle ages
-  dystopian: [4458, 3801],          // dystopia, post-apocalyptic future
-  apocalypse: [3801, 10685],        // post-apocalyptic, end of the world
-  "time travel": [4379, 878],       // time travel
-  dinosaurs: [5765, 155],           // dinosaur
-  magic: [2343, 14],                // magic, fantasy
-  supernatural: [9714, 6152],       // supernatural, ghost
-  undercover: [5340, 15001],        // undercover, spy
-  revenge: [9748, 4012],            // revenge, vigilante
-  survival: [11442, 12339],         // survival, stranded
-  ghosts: [6152, 9714],             // ghost, supernatural
-  monsters: [9685, 4683],           // monster, creature
-  superheroes: [9715, 180547],      // superhero, based on comic
+  // Plurals and singulars are both listed so either form matches
   space: [1014, 4565],
   robots: [9831, 9951],
+  robot: [9831, 9951],
   ai: [9951, 310],
   "artificial intelligence": [9951, 310],
   zombies: [12377, 6152],
@@ -112,11 +89,14 @@ const KEYWORD_MAP = {
   vampires: [3133, 162846],
   vampire: [3133, 162846],
   dragons: [11237, 14],
+  dragon: [11237, 14],
   pirates: [5765, 270],
+  pirate: [5765, 270],
   ninjas: [1596, 779],
   ninja: [1596, 779],
   samurai: [11479, 779],
   cowboys: [6027, 10195],
+  cowboy: [6027, 10195],
   heist: [10291, 15062],
   medieval: [161222, 177912],
   dystopian: [4458, 3801],
@@ -153,7 +133,6 @@ const KEYWORD_MAP = {
   war: [10752, 14643],
   mafia: [10091, 80],
   gangster: [10091, 80],
-  // New keywords
   "road trip": [1408, 12],
   "road movie": [1408, 12],
   "coming of age": [6066, 18],
@@ -239,15 +218,4 @@ const BOT_MESSAGES = {
   fallbackTrending: "Here are some movies you might enjoy! 🔥",
 };
 
-/** Labels for smart search result types (used in frontend) */
-const SEARCH_TYPE_LABELS = {
-  exact: "exact",
-  corrected: "corrected",
-  fuzzy: "fuzzy",
-  phonetic: "phonetic",
-  keyword_match: "keyword_match",
-  recommendation: "recommendation",
-  trending_fallback: "trending_fallback",
-};
-
-module.exports = { GENRE_MAP, MOOD_MAP, KEYWORD_MAP, LANGUAGE_MAP, DECADE_MAP, GREETINGS, BOT_MESSAGES, SEARCH_TYPE_LABELS };
+module.exports = { GENRE_MAP, MOOD_MAP, KEYWORD_MAP, LANGUAGE_MAP, DECADE_MAP, GREETINGS, BOT_MESSAGES };

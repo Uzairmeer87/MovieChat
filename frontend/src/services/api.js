@@ -1,38 +1,21 @@
 import axios from "axios";
 
-let apiEnv = import.meta.env.VITE_API_URL || "https://moviechat-backend.onrender.com/api";
-// Fix for missing /api in Vercel/Render env vars
-if (!apiEnv.endsWith("/api")) {
-  apiEnv = apiEnv.replace(/\/$/, "") + "/api";
-}
-const API_BASE = apiEnv;
+const API_BASE = (import.meta.env.VITE_API_URL || "https://moviechat-backend.onrender.com/api").replace(/\/$/, "");
 
 const client = axios.create({
   baseURL: API_BASE,
-  timeout: 60000, // Increased to 60s because Render free-tier sometimes takes 50s to wake up!
+  timeout: 60000, // 60s — Render free-tier can take ~50s to wake up
   headers: { "Content-Type": "application/json" },
 });
 
 /**
  * Send a chat message to the backend and return { reply, movies, searchMeta }.
- * Retries once on network failure.
  */
 export async function sendMessage(message) {
-  try {
-    const { data } = await client.post("/chat", { message });
-    return data;
-  } catch (err) {
-    if (!err.response) {
-      try {
-        const { data } = await client.post("/chat", { message });
-        return data;
-      } catch {
-        // still failed
-      }
-    }
-    throw err;
-  }
+  const { data } = await client.post("/chat", { message });
+  return data;
 }
+
 
 /**
  * Get full movie details (cast, crew, trailers) by TMDB movie ID.
