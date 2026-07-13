@@ -13,3 +13,4 @@ RUN apt-get install -y docker.io docker-compose
 RUN groupadd -f docker && usermod -aG docker jenkins
 
 USER jenkins
+RUN jenkins-plugin-cli --plugins credentials-binding gradle workflow-aggregator
