@@ -47,6 +47,9 @@ pipeline {
                 script {
                     def run = { cmd -> isUnix() ? sh(cmd) : bat(cmd) }
                     echo 'Building docker containers...'
+                    run('whoami')
+                    run('id')
+                    run('ls -l /var/run/docker.sock')
                     run('docker-compose build')
                 }
             }
