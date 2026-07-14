@@ -14,7 +14,7 @@ The easiest way to run MovieChat is with Docker.
    docker-compose up --build
    ```
 
-- **Frontend:** http://localhost:80
+- **Frontend:** http://localhost:8080
 - **Backend:** http://localhost:5000
 
 ## Jenkins CI/CD
