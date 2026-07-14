@@ -14,3 +14,5 @@ RUN groupadd -f docker && usermod -aG docker jenkins
 
 USER jenkins
 RUN jenkins-plugin-cli --plugins credentials-binding gradle workflow-aggregator
+
+USER root
