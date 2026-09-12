@@ -1,13 +1,53 @@
-import { useState } from "react";
-import ChatBox from "../components/ChatBox";
-import WatchlistPanel from "../components/WatchlistPanel";
-import MovieModal from "../components/MovieModal";
+import { useState, useEffect, useCallback } from "react";
+import Sidebar from "../components/Layout/Sidebar";
+import Header from "../components/Layout/Header";
+import SettingsModal from "../components/Layout/SettingsModal";
+import ShareModal from "../components/Chat/ShareModal";
+import ChatContainer from "../components/Chat/ChatContainer";
+import WatchlistPanel from "../components/Movies/WatchlistPanel";
+import MovieModal from "../components/Movies/MovieModal";
+
 import { useWatchlist } from "../hooks/useWatchlist";
+import { useChatHistory } from "../hooks/useChatHistory";
+import { sendMessage } from "../services/api";
 
 export default function Home() {
-  const { watchlist, addMovie, removeMovie, isInWatchlist, clearWatchlist } = useWatchlist();
+  const { watchlist, addMovie, removeMovie, isInWatchlist, clearWatchlist } =
+    useWatchlist();
+  const {
+    sessions,
+    activeSession,
+    activeId,
+    createNewChat,
+    selectChat,
+    deleteChat,
+    renameChat,
+    addMessageToActiveChat,
+    setMessagesForActiveChat,
+  } = useChatHistory();
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [watchlistOpen, setWatchlistOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [modalMovieId, setModalMovieId] = useState(null);
+  const [activeNav, setActiveNav] = useState("home");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  // Responsive sidebar handling
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   function handleToggleWatchlist(movie) {
     if (isInWatchlist(movie.id)) {
@@ -17,87 +57,111 @@ export default function Home() {
     }
   }
 
+  const handleSendMessage = useCallback(
+    async (text) => {
+      if (!text || loading) return;
+
+      const userMsg = {
+        sender: "user",
+        text,
+        movies: [],
+        searchMeta: null,
+        isNew: true,
+        timestamp: Date.now(),
+      };
+
+      // Add user message to active chat
+      addMessageToActiveChat(userMsg);
+      setLoading(true);
+      setError(false);
+
+      try {
+        const data = await sendMessage(text);
+        const botMsg = {
+          sender: "bot",
+          text: data.reply || "Here are some movies I found for you:",
+          movies: data.movies || [],
+          searchMeta: data.searchMeta || null,
+          isNew: true,
+          timestamp: Date.now(),
+        };
+        addMessageToActiveChat(botMsg);
+      } catch (err) {
+        console.error("Chat error:", err);
+        setError(true);
+        const botErrMsg = {
+          sender: "bot",
+          text: "Oops! I couldn't reach the backend server. Make sure your server is running on port 5000.",
+          movies: [],
+          searchMeta: null,
+          isNew: true,
+          timestamp: Date.now(),
+        };
+        addMessageToActiveChat(botErrMsg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading, addMessageToActiveChat]
+  );
+
   return (
-    <div className="h-screen flex flex-col app-bg dot-grid relative overflow-hidden">
-
-      {/* ── Floating Ambient Orbs ─────────────────────────────── */}
-      <div
-        className="orb"
-        style={{
-          width: "500px", height: "500px",
-          background: "radial-gradient(circle, rgba(99,102,241,0.08), transparent 70%)",
-          top: "-100px", left: "-150px",
-          animationDuration: "10s",
-        }}
-      />
-      <div
-        className="orb"
-        style={{
-          width: "400px", height: "400px",
-          background: "radial-gradient(circle, rgba(168,85,247,0.07), transparent 70%)",
-          bottom: "-50px", right: "-100px",
-          animationDuration: "14s",
-          animationDelay: "-5s",
-        }}
-      />
-      <div
-        className="orb"
-        style={{
-          width: "300px", height: "300px",
-          background: "radial-gradient(circle, rgba(236,72,153,0.05), transparent 70%)",
-          top: "40%", right: "30%",
-          animationDuration: "18s",
-          animationDelay: "-8s",
-        }}
+    <div className="h-screen w-screen flex bg-[#08090d] text-slate-100 overflow-hidden font-sans">
+      {/* ── Collapsible Left Sidebar ─────────────────────── */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        sessions={sessions}
+        activeId={activeId}
+        onSelectChat={selectChat}
+        onNewChat={createNewChat}
+        onDeleteChat={deleteChat}
+        onRenameChat={renameChat}
+        watchlistCount={watchlist.length}
+        onOpenWatchlist={() => setWatchlistOpen(true)}
+        onOpenSettings={() => setSettingsOpen(true)}
+        activeNav={activeNav}
+        setActiveNav={setActiveNav}
       />
 
-      {/* ── Header ───────────────────────── */}
-      <header className="header-glass header-glow flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 relative z-10">
-        <div className="flex items-center gap-3">
-          {/* 3D Logo Box */}
-          <div className="logo-3d">
-            <span className="text-lg">🎬</span>
+      {/* ── Main Chat Area Layout Workspace ───────────────── */}
+      <div className="flex-1 flex flex-col min-w-0 h-full p-2 sm:p-3 md:p-4 bg-[#08090d]">
+        {/* Elevated Workspace Enclosure Box */}
+        <main className="flex-1 flex flex-col min-w-0 h-full chat-workspace relative overflow-hidden">
+          {/* Header Bar */}
+          <Header
+            sidebarOpen={sidebarOpen}
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            activeChat={activeSession}
+            onRenameChat={renameChat}
+            watchlistCount={watchlist.length}
+            onOpenWatchlist={() => setWatchlistOpen(true)}
+            onOpenShare={() => setShareOpen(true)}
+          />
+
+          {/* Chat Container Area */}
+          <div className="flex-1 min-h-0 relative">
+            <ChatContainer
+              messages={activeSession?.messages || []}
+              loading={loading}
+              error={error}
+              onSend={handleSendMessage}
+              onRetry={() => {
+                const msgs = activeSession?.messages || [];
+                const lastUserMsg = [...msgs]
+                  .reverse()
+                  .find((m) => m.sender === "user");
+                if (lastUserMsg) handleSendMessage(lastUserMsg.text);
+              }}
+              isInWatchlist={isInWatchlist}
+              onToggleWatchlist={handleToggleWatchlist}
+              onMovieClick={(id) => setModalMovieId(id)}
+            />
           </div>
-          <div>
-            <h1
-              className="text-lg sm:text-xl font-bold gradient-text animate-neon tracking-tight"
-              style={{ fontFamily: "Outfit, sans-serif" }}
-            >
-              MovieChat
-            </h1>
-            <div className="flex items-center gap-1.5 -mt-0.5">
-              <div className="status-indicator" />
-              <span className="text-[10px] text-slate-500 font-medium">AI Powered</span>
-            </div>
-          </div>
-        </div>
+        </main>
+      </div>
 
-        {/* Watchlist toggle */}
-        <button
-          onClick={() => setWatchlistOpen(true)}
-          className="relative flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm text-slate-300 hover:text-white glass hover:border-indigo-500/40 transition-all cursor-pointer group"
-          style={{ transform: "translateZ(0)" }}
-        >
-          <span className="text-base group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">🎯</span>
-          <span className="hidden sm:inline font-medium">Watchlist</span>
-          {watchlist.length > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/50 animate-pulse-glow">
-              {watchlist.length}
-            </span>
-          )}
-        </button>
-      </header>
-
-      {/* ── Chat area ────────────────────── */}
-      <main className="flex-1 overflow-hidden max-w-3xl w-full mx-auto relative z-[1]">
-        <ChatBox
-          isInWatchlist={isInWatchlist}
-          onToggleWatchlist={handleToggleWatchlist}
-          onMovieClick={(id) => setModalMovieId(id)}
-        />
-      </main>
-
-      {/* ── Watchlist Panel ───────────────── */}
+      {/* ── Slide-over Watchlist Library Panel ────────────── */}
       <WatchlistPanel
         isOpen={watchlistOpen}
         onClose={() => setWatchlistOpen(false)}
@@ -110,13 +174,30 @@ export default function Home() {
         }}
       />
 
-      {/* ── Movie Detail Modal ───────────── */}
+      {/* ── Settings Modal ───────────────────────────────── */}
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+      />
+
+      {/* ── Share Modal ──────────────────────────────────── */}
+      <ShareModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        chatTitle={activeSession?.title || "MovieChat"}
+      />
+
+      {/* ── Full Movie Details Modal ─────────────────────── */}
       {modalMovieId && (
         <MovieModal
           movieId={modalMovieId}
           onClose={() => setModalMovieId(null)}
           isInWatchlist={isInWatchlist(modalMovieId)}
           onToggleWatchlist={handleToggleWatchlist}
+          onFindSimilar={(query) => {
+            setModalMovieId(null);
+            handleSendMessage(query);
+          }}
         />
       )}
     </div>
