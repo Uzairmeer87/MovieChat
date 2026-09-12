@@ -12,15 +12,17 @@ import { useState, useEffect, useRef } from "react";
 export default function TypeWriter({ text, speed = 18, onComplete, className = "" }) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
+  const [prevText, setPrevText] = useState(text);
   const indexRef = useRef(0);
   const timerRef = useRef(null);
 
-  useEffect(() => {
-    // Reset on new text
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  if (text !== prevText) {
+    setPrevText(text);
     setDisplayed("");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDone(false);
+  }
+
+  useEffect(() => {
     indexRef.current = 0;
 
     if (!text) {

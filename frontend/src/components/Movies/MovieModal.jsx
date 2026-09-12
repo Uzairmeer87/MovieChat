@@ -12,20 +12,34 @@ export default function MovieModal({
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [prevMovieId, setPrevMovieId] = useState(movieId);
+
+  if (movieId !== prevMovieId) {
+    setPrevMovieId(movieId);
+    setLoading(true);
+    setError(false);
+    setMovie(null);
+  }
 
   useEffect(() => {
     if (!movieId) return;
-    setLoading(true);
-    setError(false);
+    let isMounted = true;
     getMovieDetails(movieId)
       .then((data) => {
-        setMovie(data);
-        setLoading(false);
+        if (isMounted) {
+          setMovie(data);
+          setLoading(false);
+        }
       })
       .catch(() => {
-        setError(true);
-        setLoading(false);
+        if (isMounted) {
+          setError(true);
+          setLoading(false);
+        }
       });
+    return () => {
+      isMounted = false;
+    };
   }, [movieId]);
 
   useEffect(() => {

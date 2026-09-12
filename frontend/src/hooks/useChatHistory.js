@@ -121,7 +121,7 @@ function loadSessions() {
 function saveSessions(sessions) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-  } catch (e) {
+  } catch {
     // Fail silently if quota exceeded
   }
 }

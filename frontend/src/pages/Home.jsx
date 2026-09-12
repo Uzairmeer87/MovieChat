@@ -23,7 +23,6 @@ export default function Home() {
     deleteChat,
     renameChat,
     addMessageToActiveChat,
-    setMessagesForActiveChat,
   } = useChatHistory();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
