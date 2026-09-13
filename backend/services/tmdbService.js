@@ -30,9 +30,16 @@ function normaliseMovie(movie) {
   };
 }
 
+const {
+  getNormalizedFallbackMovies,
+  getFallbackByGenre,
+  searchFallbackMovies,
+  getFallbackMovieDetails,
+} = require("../utils/fallbackMovies");
+
 const tmdbClient = axios.create({
   baseURL: config.tmdbBaseUrl,
-  timeout: config.requestTimeout,
+  timeout: 3500, // 3.5s timeout for fast response & fallback
 });
 
 /**
@@ -61,7 +68,11 @@ async function tmdbGet(endpoint, params = {}) {
 async function rawSearch(query, limit = 10) {
   if (!query || query.trim().length === 0) return [];
   const data = await tmdbGet("/search/movie", { query: query.trim(), page: 1 });
-  return (data.results || []).slice(0, limit).map(normaliseMovie);
+  const results = (data.results || []).slice(0, limit).map(normaliseMovie);
+  if (results.length === 0) {
+    return searchFallbackMovies(query).slice(0, limit);
+  }
+  return results;
 }
 
 /** Discover popular movies by genre id(s). */
@@ -72,13 +83,21 @@ async function discoverByGenre(genreIds) {
     sort_by: "popularity.desc",
     page: 1,
   });
-  return (data.results || []).slice(0, 6).map(normaliseMovie);
+  const results = (data.results || []).slice(0, 6).map(normaliseMovie);
+  if (results.length === 0) {
+    return getFallbackByGenre(Array.isArray(genreIds) ? genreIds[0] : genreIds);
+  }
+  return results;
 }
 
 /** Get trending movies (fallback / "what's hot" feature). */
 async function getTrending() {
   const data = await tmdbGet("/trending/movie/week");
-  return (data.results || []).slice(0, 6).map(normaliseMovie);
+  const results = (data.results || []).slice(0, 6).map(normaliseMovie);
+  if (results.length === 0) {
+    return getNormalizedFallbackMovies().slice(0, 6);
+  }
+  return results;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -361,7 +380,7 @@ function dedup(movies) {
 
 async function getMovieById(movieId) {
   const data = await tmdbGet(`/movie/${movieId}`);
-  if (!data || data.success === false) return null;
+  if (!data || !data.title || data.success === false) return null;
 
   return {
     id: data.id,
@@ -432,20 +451,25 @@ async function getMovieVideos(movieId) {
 }
 
 async function getFullMovieDetails(movieId) {
-  const [movie, credits, videos] = await Promise.all([
-    getMovieById(movieId),
-    getMovieCredits(movieId),
-    getMovieVideos(movieId),
-  ]);
+  try {
+    const [movie, credits, videos] = await Promise.all([
+      getMovieById(movieId),
+      getMovieCredits(movieId),
+      getMovieVideos(movieId),
+    ]);
 
-  if (!movie) return null;
+    if (!movie) return getFallbackMovieDetails(movieId);
 
-  return {
-    ...movie,
-    cast: credits.cast,
-    crew: credits.crew,
-    videos,
-  };
+    return {
+      ...movie,
+      cast: credits.cast,
+      crew: credits.crew,
+      videos,
+    };
+  } catch (err) {
+    console.error("getFullMovieDetails error, returning fallback:", err.message);
+    return getFallbackMovieDetails(movieId);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════

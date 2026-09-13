@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -11,7 +9,6 @@ services:
     env_file:
       - ./backend/.env
     environment:
-
       - PORT=5000
     restart: unless-stopped
 
@@ -20,8 +17,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-
-        - VITE_API_URL=https://moviechat-backend.onrender.com/api
+        - VITE_API_URL=/api
     container_name: moviechat_frontend
     ports:
       - "80:80"

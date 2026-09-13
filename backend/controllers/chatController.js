@@ -243,11 +243,16 @@ async function handleChat(req, res) {
     try {
       const trendingMovies = await tmdb.getTrending();
       return res.status(200).json({
-        reply: BOT_MESSAGES.error + "\n\nHere's what's trending while we fix things! 🔧🔥",
+        reply: "Here are some top recommended movies for you! 🎬🔥",
         movies: trendingMovies,
       });
-    } catch {
-      return res.status(500).json({ reply: BOT_MESSAGES.error, movies: [] });
+    } catch (fallbackErr) {
+      console.error("Fallback error:", fallbackErr);
+      const { getNormalizedFallbackMovies } = require("../utils/fallbackMovies");
+      return res.status(200).json({
+        reply: "Here are some top recommended movies for you! 🎬🔥",
+        movies: getNormalizedFallbackMovies().slice(0, 6),
+      });
     }
   }
 }
