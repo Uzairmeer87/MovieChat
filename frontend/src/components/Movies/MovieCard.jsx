@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Star, Bookmark, Film, Info } from "lucide-react";
+import { getMovieImageUrl } from "../../utils/imageUtils";
 
 export default function MovieCard({
   movie,
@@ -7,7 +9,19 @@ export default function MovieCard({
   onToggleWatchlist,
   onClick,
 }) {
+  const [imgError, setImgError] = useState(false);
+  const [prevMovieId, setPrevMovieId] = useState(movie?.id);
+
+  if (movie?.id !== prevMovieId) {
+    setPrevMovieId(movie?.id);
+    setImgError(false);
+  }
+
   if (!movie) return null;
+
+  // Resolve poster or backdrop image
+  const rawSrc = movie.poster || movie.backdrop;
+  const imageUrl = getMovieImageUrl(rawSrc);
 
   // Format rank badge color
   const rankClass =
@@ -36,17 +50,20 @@ export default function MovieCard({
 
       {/* ── Poster Container ────────────────────── */}
       <div className="relative aspect-[16/10] sm:aspect-[16/10] overflow-hidden bg-slate-900">
-        {movie.poster ? (
+        {imageUrl && !imgError ? (
           <img
-            src={movie.poster}
+            src={imageUrl}
             alt={movie.title}
             loading="lazy"
+            onError={() => setImgError(true)}
             className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-950 text-slate-500">
-            <Film className="w-8 h-8 mb-1 opacity-50" />
-            <span className="text-[10px]">No Poster</span>
+          <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-slate-400">
+            <Film className="w-8 h-8 mb-1.5 text-orange-400/70 opacity-80" />
+            <span className="text-xs font-semibold text-slate-200 line-clamp-1 font-outfit">
+              {movie.title}
+            </span>
           </div>
         )}
 

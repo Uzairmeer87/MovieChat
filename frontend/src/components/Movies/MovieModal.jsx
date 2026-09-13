@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getMovieDetails } from "../../services/api";
-import { X, Star, Clock, Calendar, Bookmark, Play, Sparkles, User } from "lucide-react";
+import { X, Star, Clock, Calendar, Bookmark, Play, Sparkles, User, Film } from "lucide-react";
+import { getMovieImageUrl } from "../../utils/imageUtils";
 
 export default function MovieModal({
   movieId,
@@ -12,12 +13,16 @@ export default function MovieModal({
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [backdropError, setBackdropError] = useState(false);
+  const [posterError, setPosterError] = useState(false);
   const [prevMovieId, setPrevMovieId] = useState(movieId);
 
   if (movieId !== prevMovieId) {
     setPrevMovieId(movieId);
     setLoading(true);
     setError(false);
+    setBackdropError(false);
+    setPosterError(false);
     setMovie(null);
   }
 
@@ -100,15 +105,18 @@ export default function MovieModal({
         {movie && !loading && !error && (
           <>
             {/* Backdrop Image Banner */}
-            <div className="relative h-60 sm:h-72 md:h-80 overflow-hidden">
-              {movie.backdrop ? (
+            <div className="relative h-60 sm:h-72 md:h-80 overflow-hidden bg-slate-950">
+              {getMovieImageUrl(movie.backdrop, "w1280") && !backdropError ? (
                 <img
-                  src={movie.backdrop}
+                  src={getMovieImageUrl(movie.backdrop, "w1280")}
                   alt={movie.title}
+                  onError={() => setBackdropError(true)}
                   className="w-full h-full object-cover filter brightness-[0.7] saturate-[1.2]"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-r from-orange-950 via-slate-900 to-purple-950" />
+                <div className="w-full h-full bg-gradient-to-r from-orange-950 via-slate-900 to-purple-950 flex items-center justify-center">
+                  <Film className="w-16 h-16 text-white/10" />
+                </div>
               )}
 
               {/* Dark Gradient Overlay */}
@@ -116,11 +124,12 @@ export default function MovieModal({
 
               {/* Floating Poster & Title Row */}
               <div className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-6 flex items-end gap-4 z-10">
-                {movie.poster && (
-                  <div className="hidden sm:block shrink-0 w-24 h-36 rounded-xl overflow-hidden shadow-2xl border border-white/20 transform -rotate-1">
+                {getMovieImageUrl(movie.poster || movie.backdrop) && !posterError && (
+                  <div className="hidden sm:block shrink-0 w-24 h-36 rounded-xl overflow-hidden shadow-2xl border border-white/20 transform -rotate-1 bg-slate-900">
                     <img
-                      src={movie.poster}
+                      src={getMovieImageUrl(movie.poster || movie.backdrop)}
                       alt={movie.title}
+                      onError={() => setPosterError(true)}
                       className="w-full h-full object-cover"
                     />
                   </div>

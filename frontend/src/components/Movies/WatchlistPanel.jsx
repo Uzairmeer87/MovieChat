@@ -1,4 +1,28 @@
+import { useState } from "react";
 import { Bookmark, X, Trash2, Star, Film } from "lucide-react";
+import { getMovieImageUrl } from "../../utils/imageUtils";
+
+function WatchlistPoster({ movie }) {
+  const [error, setError] = useState(false);
+  const src = getMovieImageUrl(movie.poster || movie.backdrop);
+
+  if (!src || error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-slate-600 bg-slate-900">
+        <Film className="w-5 h-5 text-orange-400/60" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={movie.title}
+      onError={() => setError(true)}
+      className="w-full h-full object-cover"
+    />
+  );
+}
 
 export default function WatchlistPanel({
   isOpen,
@@ -69,17 +93,7 @@ export default function WatchlistPanel({
               >
                 {/* Poster Thumbnail */}
                 <div className="w-12 h-16 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-white/10">
-                  {movie.poster ? (
-                    <img
-                      src={movie.poster}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-600">
-                      <Film className="w-5 h-5" />
-                    </div>
-                  )}
+                  <WatchlistPoster movie={movie} />
                 </div>
 
                 {/* Info */}
