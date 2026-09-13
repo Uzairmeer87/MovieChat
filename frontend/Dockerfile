@@ -20,8 +20,8 @@ RUN npm run build
 # Stage 2: Serve the app via Nginx
 FROM nginx:alpine
 
-# Copy custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy custom Nginx configuration to templates directory to enable envsubst
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copy build artifacts to nginx root
 COPY --from=builder /app/dist /usr/share/nginx/html

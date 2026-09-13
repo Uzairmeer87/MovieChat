@@ -25,3 +25,22 @@ To run the Jenkins pipeline locally:
 docker build -t moviechat-jenkins -f Jenkins.Dockerfile .
 docker run -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home -v //var/run/docker.sock:/var/run/docker.sock --name moviechat_jenkins moviechat-jenkins
 ```
+
+## Render Deployment
+
+To deploy this project to Render as separate Web Services:
+
+1. **Backend Web Service**
+   - **Environment:** Docker
+   - **Source Directory:** `backend`
+   - **Environment Variables:**
+     - `TMDB_API_KEY`: Your TMDB API key
+     - `FRONTEND_URL`: `https://your-frontend-url.onrender.com` (to restrict CORS, or omit to allow all)
+
+2. **Frontend Web Service**
+   - **Environment:** Docker
+   - **Source Directory:** `frontend`
+   - **Environment Variables:**
+     - `BACKEND_URL`: `https://your-backend-url.onrender.com` (the Render URL of your deployed backend)
+
+The frontend Nginx container is configured to automatically route `/api/*` requests to your backend at runtime.

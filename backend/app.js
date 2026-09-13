@@ -8,8 +8,8 @@ const app = express();
 // ── Middleware ──────────────────────────────────────────
 app.use(
   cors({
-    // Allow all origins so your Vercel frontend can connect to your Render backend
-    origin: "*",
+    // Allow configured frontend origin or fallback to all for dev
+    origin: process.env.FRONTEND_URL || "*",
     methods: ["GET", "POST", "OPTIONS"],
   })
 );
@@ -35,7 +35,8 @@ app.use((err, _req, res, _next) => {
 });
 
 // ── Start ──────────────────────────────────────────────
-app.listen(config.port, () => {
-  console.log(`🚀 Server running on http://localhost:${config.port}`);
+app.listen(config.port, "0.0.0.0", () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${config.port}`);
+  console.log(`   FRONTEND_URL allowed: ${process.env.FRONTEND_URL || "ALL (*)"}`);
   console.log(`   TMDB API key: ${config.tmdbApiKey.slice(0, 6)}...✓`);
 });

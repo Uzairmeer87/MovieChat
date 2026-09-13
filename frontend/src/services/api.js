@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = (import.meta.env.VITE_API_URL || "https://moviechat-backend.onrender.com/api").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 
 const client = axios.create({
   baseURL: API_BASE,

@@ -90,7 +90,7 @@ export default function Home() {
         setError(true);
         const botErrMsg = {
           sender: "bot",
-          text: "Oops! I couldn't reach the backend server. Make sure your server is running on port 5000.",
+          text: "Oops! I couldn't reach the backend server. Please make sure the backend is correctly deployed and configured.",
           movies: [],
           searchMeta: null,
           isNew: true,
