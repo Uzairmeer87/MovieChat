@@ -1,0 +1,15 @@
+#!/bin/sh
+# 15-backend-url.envsh
+# Ensure BACKEND_URL is set and clean before envsubst runs.
+
+if [ -z "$BACKEND_URL" ] || [ "$BACKEND_URL" = "\$BACKEND_URL" ] || [ "$BACKEND_URL" = "\$backend_url" ]; then
+    export BACKEND_URL="http://backend:5000"
+fi
+
+# Strip trailing slash if present (e.g. https://xxx.onrender.com/ -> https://xxx.onrender.com)
+BACKEND_URL="${BACKEND_URL%/}"
+
+# Strip trailing /api if user accidentally included it
+BACKEND_URL="${BACKEND_URL%/api}"
+
+export BACKEND_URL

@@ -20,6 +20,13 @@ RUN npm run build
 # Stage 2: Serve the app via Nginx
 FROM nginx:alpine
 
+# Default BACKEND_URL fallback so envsubst never encounters an unexpanded variable
+ENV BACKEND_URL=http://backend:5000
+
+# Copy entrypoint scripts (e.g. BACKEND_URL sanitizer)
+COPY docker-entrypoint.d/ /docker-entrypoint.d/
+RUN chmod +x /docker-entrypoint.d/*.envsh 2>/dev/null || true
+
 # Copy custom Nginx configuration to templates directory to enable envsubst
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 

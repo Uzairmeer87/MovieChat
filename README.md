@@ -41,6 +41,6 @@ To deploy this project to Render as separate Web Services:
    - **Environment:** Docker
    - **Source Directory:** `frontend`
    - **Environment Variables:**
-     - `BACKEND_URL`: `https://your-backend-url.onrender.com` (the Render URL of your deployed backend)
+     - `BACKEND_URL`: `https://your-backend-url.onrender.com` (your backend Render URL, without trailing slash or `/api`)
 
-The frontend Nginx container is configured to automatically route `/api/*` requests to your backend at runtime.
+The frontend Nginx container automatically sanitizes `BACKEND_URL` and routes `/api/*` requests to your backend at runtime with SSL/SNI support.
