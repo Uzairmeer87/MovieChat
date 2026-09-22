@@ -1,47 +1,43 @@
 /* ── Google Fonts Import ──────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   MOVIECHAT — PREMIUM MODERN AI ASSISTANT DESIGN SYSTEM
+   MOVIECHAT — CINEMATIC DARK DESIGN SYSTEM
+   Clean · Minimal · Professional · Premium
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Root Design Tokens ───────────────────────────────────────── */
 :root {
-  --bg-app: #08090d;
-  --bg-sidebar: #0d0e14;
-  --bg-workspace: #12141d;
-  --bg-surface: #171a26;
-  --bg-surface-elevated: #1e2132;
-  --bg-surface-hover: #25293d;
-  
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-medium: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.20);
-  --border-accent: rgba(249, 115, 22, 0.35);
+  --bg-app: #0a0a0c;
+  --bg-surface: #141418;
+  --bg-surface-hover: #1c1c22;
+  --bg-surface-elevated: #1a1a20;
+  --bg-input: #111114;
 
-  --accent-red: #ef4444;
-  --accent-orange: #f97316;
-  --accent-amber: #f59e0b;
-  --accent-violet: #8b5cf6;
-  --accent-emerald: #10b981;
-  --accent-cyan: #06b6d4;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-dark: #0f172a;
+  --accent: #e8613c;
+  --accent-hover: #d4532f;
+  --accent-muted: rgba(232, 97, 60, 0.15);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --text-primary: #f0f0f0;
+  --text-secondary: #8a8a8a;
+  --text-muted: #5a5a5a;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
-  --shadow-glow-orange: 0 0 20px rgba(249, 115, 22, 0.25);
-  --shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.25);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.8);
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
 }
 
 /* ── Global Resets & Base Styles ─────────────────────────────── */
@@ -56,38 +52,53 @@ html, body {
   width: 100%;
   background-color: var(--bg-app);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  overflow: hidden;
+  font-family: 'DM Sans', 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  height: 100%;
+  width: 100%;
+}
+
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', 'Inter', sans-serif;
+  font-family: 'Outfit', 'DM Sans', sans-serif;
   letter-spacing: -0.02em;
 }
 
-/* ── Custom Scrollbar ────────────────────────────────────────── */
-.chat-scroll::-webkit-scrollbar,
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-.chat-scroll::-webkit-scrollbar-track,
-.custom-scrollbar::-webkit-scrollbar-track {
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Custom Scrollbar ────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.chat-scroll::-webkit-scrollbar-thumb,
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
 }
 
-.chat-scroll::-webkit-scrollbar-thumb:hover,
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -98,152 +109,87 @@ h1, h2, h3, h4, h5, h6 {
   scrollbar-width: none;
 }
 
-/* ── Glassmorphism Surfaces ───────────────────────────────────── */
-.glass-surface {
-  background: rgba(23, 26, 38, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-md);
-}
-
-.glass-header {
-  background: rgba(18, 20, 29, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.glass-input-container {
-  background: rgba(20, 23, 34, 0.90);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.glass-card {
-  background: rgba(23, 26, 38, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-card:hover {
-  background: rgba(30, 33, 50, 0.9);
-  border-color: var(--border-medium);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-}
-
-/* ── Elevated Chat Workspace ──────────────────────────────────── */
-.chat-workspace {
-  background: var(--bg-workspace);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-
-/* ── Rank Number Badges ────────────────────────────────────────── */
-.rank-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.rank-badge-1 {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
-}
-
-.rank-badge-2 {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
-}
-
-.rank-badge-3 {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
-}
-
-.rank-badge-4 {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
-}
-
-.rank-badge-default {
-  background: linear-gradient(135deg, #475569, #334155);
-}
-
-/* ── Shimmer & Skeleton Animations ────────────────────────────── */
+/* ── Shimmer Skeleton ────────────────────────────────────────── */
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
 
-.skeleton-box {
+.skeleton {
   position: relative;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 
-.skeleton-box::after {
+.skeleton::after {
   content: "";
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-  animation: shimmer 1.5s infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  animation: shimmer 1.8s infinite;
 }
 
-/* ── Pulse Glow Effects ───────────────────────────────────────── */
-@keyframes pulseDot {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
+/* ── Typing Indicator ────────────────────────────────────────── */
+@keyframes typingPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 .typing-dot {
-  animation: pulseDot 1.4s infinite ease-in-out;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-secondary);
+  animation: typingPulse 1.4s infinite ease-in-out;
 }
 
-/* ── Text Gradient Helper ─────────────────────────────────────── */
-.gradient-text-orange {
-  background: linear-gradient(135deg, #ffffff 0%, #f97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* ── Fade In Animation ───────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.gradient-text-purple {
-  background: linear-gradient(135deg, #ffffff 0%, #a855f7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.animate-fade-in {
+  animation: fadeInUp 0.3s ease forwards;
 }
 
-/* ── Horizontal Scroll Shadows ────────────────────────────────── */
-.scroll-fade-right {
-  position: relative;
+/* ── Modal Overlay ───────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.scroll-fade-right::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-  background: linear-gradient(to right, transparent, var(--bg-workspace));
-  pointer-events: none;
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.80);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Slide Panel ─────────────────────────────────────────────── */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.slide-panel {
+  animation: slideInRight 0.25s ease;
+}
+
+/* ── Star Rating ─────────────────────────────────────────────── */
+.star-rating {
+  color: #f59e0b;
 }
